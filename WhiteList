@@ -1,0 +1,68 @@
+-- Whitelist System
+local Whitelist = {
+    Users = {
+        "4149665167",  -- User ID 1
+        "4149669139",  -- User ID 2
+        "22222",  -- User ID 3
+    },
+    
+    Names = {
+        "Player1",
+        "Player2",
+        "Admin",
+        "Developer"
+    }
+}
+
+-- Функция для проверки игрока
+local function isPlayerWhitelisted(player)
+    -- Проверка по UserId
+    for _, userId in ipairs(Whitelist.Users) do
+        if tostring(player.UserId) == userId then
+            return true
+        end
+    end
+    
+    -- Проверка по имени
+    for _, name in ipairs(Whitelist.Names) do
+        if player.Name == name then
+            return true
+        end
+    end
+    
+    return false
+end
+
+-- Основная функция запуска
+local function initializeScript()
+    local Players = game:GetService("Players")
+    
+    -- Проверка для всех игроков уже в игре
+    for _, player in ipairs(Players:GetPlayers()) do
+        if not isPlayerWhitelisted(player) then
+            player:Kick("Вы не в белом списке.")
+        end
+    end
+    
+    -- Проверка для новых игроков
+    Players.PlayerAdded:Connect(function(player)
+        if not isPlayerWhitelisted(player) then
+            player:Kick("Вы не в белом списке.")
+        end
+    end)
+    
+    -- Загрузка и выполнение основного скрипта (только если мы дошли до этого места)
+    local success, result = pcall(function()
+        -- Используем raw ссылку GitHub для загрузки скрипта
+        local url = "https://raw.githubusercontent.com/vixsur737/Lava/main/lava.lua"
+        local response = game:HttpGetAsync(url)
+        loadstring(response)()
+    end)
+    
+    if not success then
+        warn("Ошибка загрузки скрипта Lava: " .. tostring(result))
+    end
+end
+
+-- Запускаем проверки и скрипт
+initializeScript()
